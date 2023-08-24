@@ -8,40 +8,70 @@
  * specifiers contained into fmt
  * Return: length of the formatted output string
  */
+
 int _printf(const char *format, ...)
 {
-	int (*pfunc)(va_list, flags_t *);
-	const char *p;
+	int count;
 	va_list arguments;
-	flags_t flags = {0, 0, 0};
 
-	register int count = 0;
+	if (format == NULL)
+	{
+		return -1;
+	}
 
 	va_start(arguments, format);
-	if (!format || (format[0] == '%' && !format[1]))
-		return (-1);
-	if (format[0] == '%' && format[1] == ' ' && !format[2])
-		return (-1);
-	for (p = format; *p; p++)
+
+	while (*format)
 	{
-		if (*p == '%')
+		if (*format != '%')
 		{
-			p++;
-			if (*p == '%')
+			write (1, format, 1);
+			chara_print++;
+		}
+		else
+		{
+			format++;
+			if (*format == '\0')
+				break;
+
+			if (*format == '%')
 			{
-				count += _putchar('%');
-				continue;
+				write (1, format, 1);
+				chara_print++;
 			}
-			while (get_flag(*p, &flags))
-				p++;
-			pfunc = get_print(*p);
-			count += (pfunc)
-				? pfunc(arguments, &flags)
-				: _printf("%%%c", *p);
-		} else
-			count += _putchar(*p);
+			else if (*format == 'c')
+			{
+				char c = va_arg(list_of_args, int);
+				write (1, &c, 1);
+				chara_print++;
+
+			}
+			else if (*format == '$')
+			{
+				char *str = va_arg(list_of_args, char*);
+				int str_len = 0;
+
+				while (str[str_len] != '\0' )
+					str_len++;
+
+				write (1, str, str_len);
+				chara_print += str_len;
+			}
+
+			format++;
 	}
-	_putchar(-1);
-	va_end(arguments);
-	return (count);
+
+	va_end(list_of_args);
+
+	return chara_print;
+}
+
+int main(){
+
+	_printf("Leo\n")
+	_printf("%c\n", 'v');
+	_printf("%s\n", "String");
+	_printf("%%\n");
+	return 0;
+
 }
