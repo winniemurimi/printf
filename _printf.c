@@ -8,70 +8,58 @@
  * specifiers contained into fmt
  * Return: length of the formatted output string
  */
+#include <stdio.h>
+#include <stdarg.h>
 
 int _printf(const char *format, ...)
 {
-	int count;
-	va_list arguments;
 
-	if (format == NULL)
+	va_list args;
+	va_start(args, format);
+	int printed_chars = 0;
+
+	while (*format != '\0')
 	{
-		return -1;
-	}
-
-	va_start(arguments, format);
-
-	while (*format)
+	if (*format == '%')
 	{
-		if (*format != '%')
+		format++;
+		if (*format == 'c')
 		{
-			write (1, format, 1);
-			chara_print++;
+			int ch = va_arg(args, int);
+			putchar(ch);
+			printed_chars++;
+
+		} else if (*format == 's')
+		{
+			char *str = va_arg(args, char *);
+
+			while (*str != '\0')
+			{
+				putchar(*str);
+				str++;
+				printed_chars++;
+			}
+		} else if (*format == '%')
+		{
+			putchar('%');
+			printed_chars++;
 		}
-		else
-		{
-			format++;
-			if (*format == '\0')
-				break;
-
-			if (*format == '%')
-			{
-				write (1, format, 1);
-				chara_print++;
-			}
-			else if (*format == 'c')
-			{
-				char c = va_arg(list_of_args, int);
-				write (1, &c, 1);
-				chara_print++;
-
-			}
-			else if (*format == '$')
-			{
-				char *str = va_arg(list_of_args, char*);
-				int str_len = 0;
-
-				while (str[str_len] != '\0' )
-					str_len++;
-
-				write (1, str, str_len);
-				chara_print += str_len;
-			}
-
-			format++;
+	} else
+	{
+		putchar(*format);
+		printed_chars++;
 	}
 
-	va_end(list_of_args);
+	format++;
+	}
 
-	return chara_print;
+	va_end(args);
+
+	return (printed_chars);
 }
 
-int main(){
-
-	_printf("Leo\n")
-	_printf("%c\n", 'v');
-	_printf("%s\n", "String");
-	_printf("%%\n");
+int main(void) 
+{
+	_printf("Hello, %s! The character is %c and the percentage is %%.\n", "World", 'A');
 	return 0;
-
 }
